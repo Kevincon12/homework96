@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import connectDB from './db';
 import usersRouter from './routes/users';
+import cocktailsRouter from './routes/cocktails';
+
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -15,6 +17,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/users', usersRouter);
+app.use('/cocktails', cocktailsRouter);
 
 const start = async () => {
     await connectDB();
