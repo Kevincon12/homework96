@@ -31,4 +31,30 @@ cocktailsRouter.post('/', auth, async (req: AuthRequest, res) => {
     }
 });
 
+cocktailsRouter.get('/mine', auth, async (req: AuthRequest, res) => {
+    try {
+        const cocktails = await CocktailModel.find({
+            user: req.user?._id
+        });
+
+        res.send(cocktails);
+    } catch (e) {
+        console.error(e);
+        res.status(500).send({ error: 'Something went wrong' });
+    }
+});
+
+cocktailsRouter.get('/', async (req, res) => {
+    try {
+        const cocktails = await CocktailModel.find({
+            isPublished: true
+        });
+
+        res.send(cocktails);
+    } catch (e) {
+        console.error(e);
+        res.status(500).send({ error: 'Something went wrong' });
+    }
+});
+
 export default cocktailsRouter;
