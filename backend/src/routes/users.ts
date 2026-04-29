@@ -43,4 +43,38 @@ usersRouter.post('/', async (req, res) => {
     }
 });
 
+usersRouter.post('/sessions', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            return res.status(400).send({ error: 'Email or password is incorrect' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.status(400).send({ error: 'Email or password is incorrect' });
+        }
+
+        user.token = nanoid();
+        await user.save();
+
+        return res.send({
+            _id: user._id,
+            email: user.email,
+            displayName: user.displayName,
+            avatar: user.avatar,
+            role: user.role,
+            token: user.token
+        });
+
+    } catch (e) {
+        console.error(e);
+        res.status(500).send({ error: 'Something went wrong' });
+    }
+});
+
 export default usersRouter;
