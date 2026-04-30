@@ -36,6 +36,7 @@ const CocktailSchema = new Schema({
             },
             value: {
                 type: Number,
+                required: true,
                 min: 1,
                 max: 5
             }
