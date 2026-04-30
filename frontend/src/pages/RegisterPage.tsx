@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { TextField, Button, Typography, Box } from '@mui/material';
 import { useAppDispatch } from '../app/hooks';
 import { register } from '../features/users/userSlice';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterPage = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
 
     const [form, setForm] = useState({
         email: '',
@@ -19,9 +21,15 @@ const RegisterPage = () => {
         });
     };
 
-    const onSubmit = (e: React.FormEvent) => {
+    const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        dispatch(register(form));
+
+        try {
+            await dispatch(register(form)).unwrap();
+            navigate('/');
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     return (
@@ -37,11 +45,7 @@ const RegisterPage = () => {
                 gap: 2
             }}
         >
-            <Typography
-                variant="h5"
-                component="div"
-                sx={{ textAlign: 'center' }}
-            >
+            <Typography variant="h5" sx={{ textAlign: 'center' }}>
                 Register
             </Typography>
 

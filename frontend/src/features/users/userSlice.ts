@@ -16,7 +16,7 @@ interface UserState {
 }
 
 const initialState: UserState = {
-    user: null,
+    user: JSON.parse(localStorage.getItem('user') || 'null'),
     loading: false
 };
 
@@ -42,6 +42,11 @@ const userSlice = createSlice({
     reducers: {
         logout: (state) => {
             state.user = null;
+            localStorage.removeItem('user');
+        },
+
+        setUser: (state, action) => {
+            state.user = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -49,6 +54,7 @@ const userSlice = createSlice({
             .addCase(register.fulfilled, (state, action) => {
                 state.user = action.payload;
                 state.loading = false;
+                localStorage.setItem('user', JSON.stringify(action.payload));
             })
             .addCase(register.pending, (state) => {
                 state.loading = true;
@@ -60,6 +66,7 @@ const userSlice = createSlice({
             .addCase(login.fulfilled, (state, action) => {
                 state.user = action.payload;
                 state.loading = false;
+                localStorage.setItem('user', JSON.stringify(action.payload));
             })
             .addCase(login.pending, (state) => {
                 state.loading = true;
@@ -70,5 +77,5 @@ const userSlice = createSlice({
     }
 });
 
-export const { logout } = userSlice.actions;
+export const { logout, setUser } = userSlice.actions;
 export default userSlice.reducer;

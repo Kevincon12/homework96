@@ -7,6 +7,7 @@ import { logout } from './features/users/userSlice';
 
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
+import CreateCocktailPage from './pages/CreateCocktailPage';
 
 const Home = () => {
     return <div style={{ padding: 20 }}>Home Page</div>;
@@ -28,6 +29,12 @@ const App = () => {
                         <Button color="inherit" component={Link} to="/">
                             Home
                         </Button>
+
+                        {user && (
+                            <Button color="inherit" component={Link} to="/create-cocktail">
+                                Create Cocktail
+                            </Button>
+                        )}
 
                         {user && (
                             <Button color="inherit" component={Link} to="/my-cocktails">
@@ -69,6 +76,7 @@ const App = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/create-cocktail" element={<CreateCocktailPage />} />
             </Routes>
         </>
     );

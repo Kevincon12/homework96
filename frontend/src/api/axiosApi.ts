@@ -5,6 +5,12 @@ const axiosApi = axios.create({
 });
 
 axiosApi.interceptors.request.use((config) => {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    if (user?.token) {
+        config.headers.Authorization = user.token;
+    }
+
     return config;
 });
 
