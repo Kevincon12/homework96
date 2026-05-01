@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosApi from '../api/axiosApi';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Rating } from '@mui/material';
+import { useAppSelector } from '../app/hooks';
 
 interface Ingredient {
     name: string;
@@ -14,20 +15,37 @@ interface Cocktail {
     image: string;
     recipe: string;
     ingredients: Ingredient[];
+    avgRating: number;
+    ratingsCount: number;
 }
 
 const CocktailDetailsPage = () => {
     const { id } = useParams();
+    const user = useAppSelector(state => state.user.user);
+
     const [cocktail, setCocktail] = useState<Cocktail | null>(null);
+    const [value, setValue] = useState<number | null>(0);
+
+    const fetchCocktail = async () => {
+        const response = await axiosApi.get(`/cocktails/${id}`);
+        setCocktail(response.data);
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            const response = await axiosApi.get(`/cocktails/${id}`);
-            setCocktail(response.data);
-        };
-
-        fetchData();
+        fetchCocktail();
     }, [id]);
+
+    const handleRating = async (_: any, newValue: number | null) => {
+        if (!newValue) return;
+
+        setValue(newValue);
+
+        await axiosApi.post(`/cocktails/${id}/rating`, {
+            value: newValue
+        });
+
+        await fetchCocktail();
+    };
 
     if (!cocktail) {
         return <Typography sx={{ p: 3 }}>Loading...</Typography>;
@@ -38,6 +56,18 @@ const CocktailDetailsPage = () => {
             <Typography variant="h4">
                 {cocktail.name}
             </Typography>
+
+            <Typography sx={{ mt: 1 }}>
+                Rating: {cocktail.avgRating?.toFixed(1) || 0} ({cocktail.ratingsCount} votes)
+            </Typography>
+
+            {user && (
+                <Rating
+                    sx={{ mt: 1 }}
+                    value={value}
+                    onChange={handleRating}
+                />
+            )}
 
             {cocktail.image && (
                 <img
