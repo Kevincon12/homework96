@@ -8,10 +8,8 @@ import { logout } from './features/users/userSlice';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import CreateCocktailPage from './pages/CreateCocktailPage';
-
-const Home = () => {
-    return <div style={{ padding: 20 }}>Home Page</div>;
-};
+import CocktailsPage from "./pages/CocktailsPage.tsx";
+import CocktailDetailsPage from "./pages/CocktailDetailsPage.tsx";
 
 const App = () => {
     const user = useAppSelector(state => state.user.user);
@@ -73,10 +71,11 @@ const App = () => {
             </AppBar>
 
             <Routes>
-                <Route path="/" element={<Home />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/create-cocktail" element={<CreateCocktailPage />} />
+                <Route path="/" element={<CocktailsPage />} />
+                <Route path="/cocktail/:id" element={<CocktailDetailsPage />} />
             </Routes>
         </>
     );
