@@ -44,13 +44,18 @@ cocktailsRouter.get('/mine', auth, async (req: AuthRequest, res) => {
     }
 });
 
-cocktailsRouter.get('/', async (req, res) => {
+cocktailsRouter.get('/', auth, async (req: AuthRequest, res) => {
     try {
-        const cocktails = await CocktailModel.find({
-            isPublished: true
-        });
+        const isAdmin = req.user?.role === 'admin';
+
+        const query = isAdmin
+            ? {}
+            : { isPublished: true };
+
+        const cocktails = await CocktailModel.find(query);
 
         res.send(cocktails);
+
     } catch (e) {
         console.error(e);
         res.status(500).send({ error: 'Something went wrong' });
@@ -96,11 +101,12 @@ cocktailsRouter.patch('/:id/publish', auth, async (req: AuthRequest, res) => {
             return res.status(404).send({ error: 'Not found' });
         }
 
-        cocktail.isPublished = true;
+        cocktail.isPublished = !cocktail.isPublished;
+
         await cocktail.save();
 
         res.send({
-            message: 'Cocktail published',
+            message: 'Cocktail updated',
             cocktail
         });
 

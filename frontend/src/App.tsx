@@ -10,6 +10,7 @@ import LoginPage from './pages/LoginPage';
 import CreateCocktailPage from './pages/CreateCocktailPage';
 import CocktailsPage from "./pages/CocktailsPage.tsx";
 import CocktailDetailsPage from "./pages/CocktailDetailsPage.tsx";
+import MyCocktailsPage from "./pages/MyCocktailsPage.tsx";
 
 const App = () => {
     const user = useAppSelector(state => state.user.user);
@@ -76,6 +77,7 @@ const App = () => {
                 <Route path="/create-cocktail" element={<CreateCocktailPage />} />
                 <Route path="/" element={<CocktailsPage />} />
                 <Route path="/cocktail/:id" element={<CocktailDetailsPage />} />
+                <Route path="/my-cocktails" element={<MyCocktailsPage />} />
             </Routes>
         </>
     );

@@ -9,6 +9,11 @@ interface Ingredient {
     amount: string;
 }
 
+interface RatingType {
+    user: string;
+    value: number;
+}
+
 interface Cocktail {
     _id: string;
     name: string;
@@ -17,6 +22,7 @@ interface Cocktail {
     ingredients: Ingredient[];
     avgRating: number;
     ratingsCount: number;
+    ratings: RatingType[];
 }
 
 const CocktailDetailsPage = () => {
@@ -28,12 +34,26 @@ const CocktailDetailsPage = () => {
 
     const fetchCocktail = async () => {
         const response = await axiosApi.get(`/cocktails/${id}`);
-        setCocktail(response.data);
+        const data = response.data;
+
+        setCocktail(data);
+
+        if (user && data.ratings) {
+            const myRating = data.ratings.find(
+                (r: RatingType) => r.user === user._id
+            );
+
+            if (myRating) {
+                setValue(myRating.value);
+            } else {
+                setValue(0);
+            }
+        }
     };
 
     useEffect(() => {
         fetchCocktail();
-    }, [id]);
+    }, [id, user]);
 
     const handleRating = async (_: any, newValue: number | null) => {
         if (!newValue) return;

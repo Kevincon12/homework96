@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axiosApi from '../api/axiosApi';
-import { Card, CardContent, CardMedia, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardMedia, Typography, Box, Button } from '@mui/material';
 import { useAppSelector } from '../app/hooks';
 
 interface Cocktail {
@@ -11,22 +11,20 @@ interface Cocktail {
     isPublished: boolean;
 }
 
-const CocktailsPage = () => {
+const MyCocktailsPage = () => {
     const [cocktails, setCocktails] = useState<Cocktail[]>([]);
     const navigate = useNavigate();
     const user = useAppSelector(state => state.user.user);
 
     const fetchData = async () => {
-        const url = user?.role === 'admin'
-            ? '/cocktails'
-            : '/cocktails';
-
-        const response = await axiosApi.get(url);
+        const response = await axiosApi.get('/cocktails/mine');
         setCocktails(response.data);
     };
 
     useEffect(() => {
-        fetchData();
+        if (user) {
+            fetchData();
+        }
     }, [user]);
 
     const publishToggle = async (id: string) => {
@@ -39,19 +37,22 @@ const CocktailsPage = () => {
         fetchData();
     };
 
+    if (!user) {
+        return <Typography sx={{ p: 3 }}>Please login</Typography>;
+    }
+
     return (
-        <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-            gap: 20,
-            padding: 20
-        }}>
+        <Box
+            sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                gap: 2,
+                p: 3
+            }}
+        >
             {cocktails.map(c => (
                 <Card key={c._id}>
-                    <div
-                        onClick={() => navigate(`/cocktail/${c._id}`)}
-                        style={{ cursor: 'pointer' }}
-                    >
+                    <div onClick={() => navigate(`/cocktail/${c._id}`)} style={{ cursor: 'pointer' }}>
                         {c.image && (
                             <CardMedia
                                 component="img"
@@ -66,7 +67,7 @@ const CocktailsPage = () => {
                                 {c.name}
                             </Typography>
 
-                            {user?.role === 'admin' && !c.isPublished && (
+                            {!c.isPublished && (
                                 <Typography color="error">
                                     Unpublished
                                 </Typography>
@@ -74,8 +75,8 @@ const CocktailsPage = () => {
                         </CardContent>
                     </div>
 
-                    {user?.role === 'admin' && (
-                        <div style={{ display: 'flex', gap: 8, padding: 10 }}>
+                    {user.role === 'admin' && (
+                        <Box sx={{ display: 'flex', gap: 1, p: 1 }}>
                             <Button
                                 size="small"
                                 variant="contained"
@@ -92,12 +93,12 @@ const CocktailsPage = () => {
                             >
                                 Delete
                             </Button>
-                        </div>
+                        </Box>
                     )}
                 </Card>
             ))}
-        </div>
+        </Box>
     );
 };
 
-export default CocktailsPage;
+export default MyCocktailsPage;
