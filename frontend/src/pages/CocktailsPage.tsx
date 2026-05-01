@@ -1,8 +1,15 @@
 import { useEffect, useState } from 'react';
 import axiosApi from '../api/axiosApi';
-import { Card, CardContent, CardMedia, Typography, Button } from '@mui/material';
+import {
+    Card,
+    CardContent,
+    CardMedia,
+    Typography,
+    Button
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../app/hooks';
+import Loader from '../components/Loader';
 
 interface Cocktail {
     _id: string;
@@ -13,16 +20,20 @@ interface Cocktail {
 
 const CocktailsPage = () => {
     const [cocktails, setCocktails] = useState<Cocktail[]>([]);
+    const [loading, setLoading] = useState(false);
+
     const navigate = useNavigate();
     const user = useAppSelector(state => state.user.user);
 
     const fetchData = async () => {
-        const url = user?.role === 'admin'
-            ? '/cocktails'
-            : '/cocktails';
+        setLoading(true);
 
-        const response = await axiosApi.get(url);
-        setCocktails(response.data);
+        try {
+            const response = await axiosApi.get('/cocktails');
+            setCocktails(response.data);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -39,13 +50,17 @@ const CocktailsPage = () => {
         fetchData();
     };
 
+    if (loading) return <Loader />;
+
     return (
-        <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-            gap: 20,
-            padding: 20
-        }}>
+        <div
+            style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                gap: 20,
+                padding: 20
+            }}
+        >
             {cocktails.map(c => (
                 <Card key={c._id}>
                     <div
@@ -57,7 +72,6 @@ const CocktailsPage = () => {
                                 component="img"
                                 height="200"
                                 image={c.image}
-                                alt={c.name}
                             />
                         )}
 

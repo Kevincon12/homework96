@@ -3,33 +3,33 @@ import { TextField, Button, Typography, Box } from '@mui/material';
 import { useAppDispatch } from '../app/hooks';
 import { login } from '../features/users/userSlice';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../components/Loader';
 
 const LoginPage = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+
+    const [loading, setLoading] = useState(false);
 
     const [form, setForm] = useState({
         email: '',
         password: ''
     });
 
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value
-        });
-    };
-
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        setLoading(true);
 
         try {
             await dispatch(login(form)).unwrap();
             navigate('/');
-        } catch (e) {
-            console.error(e);
+        } finally {
+            setLoading(false);
         }
     };
+
+    if (loading) return <Loader />;
 
     return (
         <Box
@@ -44,7 +44,10 @@ const LoginPage = () => {
                 gap: 2
             }}
         >
-            <Typography variant="h5" sx={{ textAlign: 'center' }}>
+            <Typography
+                variant="h5"
+                sx={{ textAlign: 'center' }}
+            >
                 Login
             </Typography>
 
@@ -52,7 +55,9 @@ const LoginPage = () => {
                 label="Email"
                 name="email"
                 value={form.email}
-                onChange={onChange}
+                onChange={(e) =>
+                    setForm({ ...form, email: e.target.value })
+                }
                 fullWidth
             />
 
@@ -61,11 +66,18 @@ const LoginPage = () => {
                 name="password"
                 type="password"
                 value={form.password}
-                onChange={onChange}
+                onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                }
                 fullWidth
             />
 
-            <Button type="submit" variant="contained" fullWidth>
+            <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                disabled={loading}
+            >
                 Login
             </Button>
         </Box>
